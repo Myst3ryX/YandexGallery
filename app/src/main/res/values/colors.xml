@@ -9,6 +9,7 @@
     <color name="color_text_sub">#7F7F7F</color>
 
     <color name="color_background_main">#F2F2F2</color>
+    <color name="color_background_secondary">#222222</color>
 
     <color name="color_image_placeholder">#DBDBDB</color>
 </resources>

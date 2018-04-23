@@ -1,5 +1,7 @@
 package com.myst3ry.yandexgallery.ui.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.network.GlideApp;
+import com.myst3ry.yandexgallery.ui.activity.ImageDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +56,23 @@ public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImage
         return images.get(position);
     }
 
-    final class ImageHolder extends RecyclerView.ViewHolder {
+    final class ImageHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @BindView(R.id.image_view) ImageView imageView;
 
         ImageHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this); //test
+        }
+
+        @Override
+        public void onClick(View v) {
+            final Context context = v.getContext();
+            Intent intent = new Intent(context, ImageDetailActivity.class);
+            Image imageSelected = getImage(getLayoutPosition());
+            intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_DETAIL, imageSelected);
+            context.startActivity(intent);
         }
     }
 }

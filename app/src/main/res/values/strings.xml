@@ -3,6 +3,7 @@
     <string name="app_name">Yandex Gallery</string>
     <string name="gallery_empty_text">Your Yandex Gallery is Empty</string>
     <string name="action_one">Some Action</string>
+    <string name="large_image_content_desc">Large Image</string>
 
     <!--<string name="error_no_connection">No Connection</string>-->
     <!--<string name="error_server_not_response">Server Not Response</string>-->
