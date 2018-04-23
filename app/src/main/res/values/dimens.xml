@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="rec_view_padding">0.1dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="item_image_margin">0.1dp</dimen>
+    <dimen name="item_image_height">200dp</dimen>
+</resources>
