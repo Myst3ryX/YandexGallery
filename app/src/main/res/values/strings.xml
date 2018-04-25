@@ -1,12 +1,17 @@
 <resources>
 
     <string name="app_name">Yandex Gallery</string>
-    <string name="gallery_empty_text">Your Yandex Gallery is Empty</string>
-    <string name="action_one">Some Action</string>
     <string name="large_image_content_desc">Large Image</string>
 
-    <!--<string name="error_no_connection">No Connection</string>-->
+    <!--Errors-->
+    <string name="error_no_connection">No Connection</string>
+    <string name="error_loading_image">Error while loading Image</string>
     <!--<string name="error_server_not_response">Server Not Response</string>-->
     <!--<string name="error_no_data">Nothing To Show</string>-->
+
+    <!--Temp-->
+    <string name="gallery_empty_text">Your Gallery is empty</string>
+    <string name="retry_button">Retry</string>
+    <string name="action_one">Some Action</string>
 
 </resources>

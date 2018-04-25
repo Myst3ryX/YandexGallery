@@ -6,11 +6,4 @@
         <item name="colorAccent">@color/color_accent</item>
     </style>
 
-    <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">@color/color_primary</item>
-        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
-        <item name="titleTextAppearance">?android:attr/textAppearanceLarge</item>
-        <item name="subtitleTextAppearance">?android:attr/textAppearanceSmall</item>
-    </style>
-
 </resources>

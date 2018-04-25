@@ -1,7 +1,6 @@
 package com.myst3ry.yandexgallery.ui.activity;
 
 import android.support.annotation.LayoutRes;
-
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
