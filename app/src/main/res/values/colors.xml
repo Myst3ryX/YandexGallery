@@ -14,4 +14,10 @@
 
     <color name="color_toolbar_transparent">#66009688</color>
 
+    <array name="swipeRefreshColors">
+        <item>@color/color_accent</item>
+        <item>@color/color_primary</item>
+        <item>@color/color_primary_dark</item>
+    </array>
+
 </resources>

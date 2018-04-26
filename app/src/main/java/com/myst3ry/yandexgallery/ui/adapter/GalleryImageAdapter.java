@@ -1,6 +1,5 @@
 package com.myst3ry.yandexgallery.ui.adapter;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -8,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.network.GlideApp;
@@ -20,6 +21,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 
 public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapter.ImageHolder> {
@@ -34,12 +37,15 @@ public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImage
     @Override
     public void onBindViewHolder(@NonNull ImageHolder holder, int position) {
         Image image = getImage(position);
-        GlideApp.with(holder.itemView.getContext())
-                .load(image.getImagePreviewUrl())
-                .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.color.color_image_placeholder)
-                .into(holder.imageView);
+        if (image != null) {
+            GlideApp.with(holder.itemView.getContext())
+                    .load(image.getImagePreviewUrl())
+                    .centerCrop()
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.color.color_image_placeholder)
+                    .into(holder.imageView);
+        }
     }
 
     @Override
@@ -56,23 +62,27 @@ public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImage
         return images.get(position);
     }
 
-    final class ImageHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    final class ImageHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.image_view) ImageView imageView;
+
+        @OnClick(R.id.image_view)
+        public void onClick() {
+            Intent intent = new Intent(itemView.getContext(), ImageDetailActivity.class);
+            Image imageSelected = getImage(getLayoutPosition());
+            intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_DETAIL, imageSelected);
+            itemView.getContext().startActivity(intent);
+        }
+
+        @OnLongClick(R.id.image_view)
+        public boolean onLongClick() {
+            Toast.makeText(itemView.getContext(), "Long Click!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
 
         ImageHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this); //test
-        }
-
-        @Override
-        public void onClick(View v) {
-            final Context context = v.getContext();
-            Intent intent = new Intent(context, ImageDetailActivity.class);
-            Image imageSelected = getImage(getLayoutPosition());
-            intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_DETAIL, imageSelected);
-            context.startActivity(intent);
         }
     }
 }

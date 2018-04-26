@@ -1,6 +1,5 @@
 package com.myst3ry.yandexgallery.ui.activity;
 
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +14,7 @@ import android.widget.ProgressBar;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.myst3ry.yandexgallery.R;
@@ -35,17 +35,16 @@ public final class ImageDetailActivity extends BaseActivity {
     public static final String EXTRA_IMAGE_DETAIL = "extra image detail";
 
     private Image image;
-    private String title;
+    private String barTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_detail);
-        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.color_primary), PorterDuff.Mode.MULTIPLY);
 
         image = getIntent().getParcelableExtra(EXTRA_IMAGE_DETAIL);
         if (image != null) {
-            title = image.getImageName();
+            barTitle = image.getImageName();
             loadImage();
         }
 
@@ -79,6 +78,7 @@ public final class ImageDetailActivity extends BaseActivity {
         GlideApp.with(this)
                 .load(image.getImageUrl())
                 .centerInside()
+                .transition(DrawableTransitionOptions.withCrossFade(400))
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .listener(new RequestListener<Drawable>() {
                     @Override
@@ -101,7 +101,7 @@ public final class ImageDetailActivity extends BaseActivity {
     private void setUpActionBar() {
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
-            bar.setTitle(title);
+            bar.setTitle(barTitle);
             bar.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.toolbar_background_translucent));
             bar.setDisplayHomeAsUpEnabled(true);
             bar.setHomeButtonEnabled(true);

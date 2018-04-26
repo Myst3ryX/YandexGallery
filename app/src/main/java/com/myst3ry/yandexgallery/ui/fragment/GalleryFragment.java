@@ -1,12 +1,12 @@
 package com.myst3ry.yandexgallery.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,16 +36,22 @@ public final class GalleryFragment extends BaseFragment {
     private static final String QUERY_PREVIEW_SIZE = "XL";
     private static final boolean QUERY_PREVIEW_CROP = true;
     private static final int QUERY_ITEMS_LIMIT = 50;
-//    private static final String[] QUERY_ITEM_FIELDS = {"items.name", "items.path", "items.created", "items.modified",
-//            "items.file", "items.preview", "items.media_type", "items.mime_type", "items.size"};
 
     private List<Image> images;
     private YandexDiskApi yandexDiskApi;
     private GalleryImageAdapter imageAdapter;
 
-    @BindView(R.id.fab_add_images) FloatingActionButton fabAddImages;
-    @BindView(R.id.gallery_rec_view) RecyclerView galleryRecyclerView;
-    @BindView(R.id.progress_bar) ProgressBar progressBar;
+    private int itemsLimitInc = 0;
+    private boolean isLoading = false;
+
+    @BindView(R.id.fab_add_images)
+    FloatingActionButton fabAddImages;
+    @BindView(R.id.gallery_rec_view)
+    RecyclerView galleryRecyclerView;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+    @BindView(R.id.refresher)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,9 +66,8 @@ public final class GalleryFragment extends BaseFragment {
         yandexDiskApi = new NetworkHelper().getApi();
         imageAdapter = new GalleryImageAdapter();
 
-        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.color_primary), PorterDuff.Mode.MULTIPLY);
-
-        galleryRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        galleryRecyclerView.setLayoutManager(gridLayoutManager);
         galleryRecyclerView.setAdapter(imageAdapter);
         galleryRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -71,13 +76,28 @@ public final class GalleryFragment extends BaseFragment {
                 super.onScrollStateChanged(recyclerView, newState);
             }
 
-            //hide fab with scrolling down and show with scrolling up
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                //hide fab with scrolling down and show with scrolling up
                 if (dy > 0 && fabAddImages.isShown()) {
                     fabAddImages.hide();
-                } else if (dy < 0 && !fabAddImages.isShown()){
+                } else if (dy < 0 && !fabAddImages.isShown()) {
                     fabAddImages.show();
+                }
+
+                //simple pagination
+                if (dy > 0) {
+                    int visibleItemCount = gridLayoutManager.getChildCount();
+                    int totalItemCount = gridLayoutManager.getItemCount();
+                    int pastVisibleItems = gridLayoutManager.findFirstVisibleItemPosition();
+
+                    if (!isLoading) {
+                        if ((visibleItemCount + pastVisibleItems + 25) >= totalItemCount) {
+                            itemsLimitInc += QUERY_ITEMS_LIMIT;
+                            loadImages(itemsLimitInc);
+                        }
+                    }
                 }
             }
         });
@@ -86,23 +106,31 @@ public final class GalleryFragment extends BaseFragment {
             Timber.i("Fab Clicked");
             //add new images from device to the gallery
         });
+
+        swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
+        swipeRefreshLayout.setOnRefreshListener(() -> loadImages(0));
     }
 
     @Override
     public void onStart() {
         super.onStart();
         if (images == null) {
-            loadImages();
+            progressBar.setVisibility(View.VISIBLE);
+            loadImages(itemsLimitInc);
         }
     }
 
     @SuppressLint("CheckResult")
-    private void loadImages() {
-        yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT, QUERY_MEDIA_TYPE, QUERY_PREVIEW_CROP, QUERY_PREVIEW_SIZE)
+    private void loadImages(final int itemsLimitInc) {
+        yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + itemsLimitInc, QUERY_MEDIA_TYPE, QUERY_PREVIEW_CROP, QUERY_PREVIEW_SIZE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(d -> showProgressBar(true))
-                .doAfterTerminate(() -> showProgressBar(false))
+                .doOnSubscribe((s) -> isLoading = true)
+                .doAfterTerminate(() -> {
+                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
+                    isLoading = false;
+                })
                 .doOnError(this::handleError)
                 .subscribe(response -> {
                     images = response.getImages();
@@ -125,12 +153,6 @@ public final class GalleryFragment extends BaseFragment {
             int code = httpException.code();
             //...
             Snackbar.make(galleryRecyclerView, httpException.message(), Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    private void showProgressBar(boolean isLoading) {
-        if (progressBar != null) {
-            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         }
     }
 }
