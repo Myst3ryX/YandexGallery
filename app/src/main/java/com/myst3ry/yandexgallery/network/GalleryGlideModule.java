@@ -33,7 +33,7 @@ public final class GalleryGlideModule extends AppGlideModule {
 
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
-        OkHttpClient okHttpClient = new NetworkHelper().getOkHttpClient();
+        OkHttpClient okHttpClient = new NetworkHelper(context).getOkHttpClient();
         //replace default networking logic to okhttp
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(okHttpClient));
     }

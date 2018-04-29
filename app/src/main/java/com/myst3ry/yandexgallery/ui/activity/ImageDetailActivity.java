@@ -7,9 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -27,25 +25,25 @@ import timber.log.Timber;
 
 public final class ImageDetailActivity extends BaseActivity {
 
-    @BindView(R.id.image_large)
-    ImageView imageLarge;
-    @BindView(R.id.progress_bar)
-    ProgressBar progressBar;
-
     public static final String EXTRA_IMAGE_DETAIL = "extra image detail";
 
     private Image image;
     private String barTitle;
 
+    @BindView(R.id.image_large)
+    ImageView imageLarge;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_detail);
-
         image = getIntent().getParcelableExtra(EXTRA_IMAGE_DETAIL);
+
         if (image != null) {
             barTitle = image.getImageName();
             loadImage();
+        } else {
+            //show error that image can't be shown
         }
 
         setUpActionBar();
@@ -71,27 +69,25 @@ public final class ImageDetailActivity extends BaseActivity {
         }
     }
 
-    //init load image and show/hide ProgressBar
+    //init load image, thumbnail will be placed before full sized image was loaded
     private void loadImage() {
-        progressBar.setVisibility(View.VISIBLE);
-
         GlideApp.with(this)
                 .load(image.getImageUrl())
+                .thumbnail(GlideApp.with(this).load(image.getImagePreviewUrl()))
                 .centerInside()
                 .transition(DrawableTransitionOptions.withCrossFade(400))
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        Timber.e("Loading error");
+                        //show Toast or Snackbar for image loading/no connection error here
+                        Timber.e("Full sized Image loading error %s", e != null ? e.getMessage() : null);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        Timber.i("Image was successfully loaded");
+                        Timber.i("Full sized Image was successfully loaded");
                         return false;
                     }
                 })

@@ -1,6 +1,5 @@
 package com.myst3ry.yandexgallery.ui.fragment;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,14 +15,17 @@ import android.widget.ProgressBar;
 
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
+import com.myst3ry.yandexgallery.model.ImagesList;
 import com.myst3ry.yandexgallery.network.NetworkHelper;
 import com.myst3ry.yandexgallery.network.YandexDiskApi;
 import com.myst3ry.yandexgallery.ui.adapter.GalleryImageAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import timber.log.Timber;
@@ -34,14 +36,17 @@ public final class GalleryFragment extends BaseFragment {
     //API Query Constants (actually, they shouldn't be here :])
     private static final String QUERY_MEDIA_TYPE = "image";
     private static final String QUERY_PREVIEW_SIZE = "XL";
-    private static final boolean QUERY_PREVIEW_CROP = true;
+    private static final boolean QUERY_PREVIEW_CROP = false;
     private static final int QUERY_ITEMS_LIMIT = 50;
+
+    private static final String STATE_LAST_SAVED_IMAGES = "last saved images state";
 
     private List<Image> images;
     private YandexDiskApi yandexDiskApi;
     private GalleryImageAdapter imageAdapter;
+    private Disposable disposable;
 
-    private int itemsLimitInc = 0;
+    private int loadMoreLimit = 0;
     private boolean isLoading = false;
 
     @BindView(R.id.fab_add_images)
@@ -63,7 +68,7 @@ public final class GalleryFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        yandexDiskApi = new NetworkHelper().getApi();
+        yandexDiskApi = new NetworkHelper(view.getContext()).getApi();
         imageAdapter = new GalleryImageAdapter();
 
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
@@ -94,8 +99,10 @@ public final class GalleryFragment extends BaseFragment {
 
                     if (!isLoading) {
                         if ((visibleItemCount + pastVisibleItems + 25) >= totalItemCount) {
-                            itemsLimitInc += QUERY_ITEMS_LIMIT;
-                            loadImages(itemsLimitInc);
+                            loadMoreLimit += QUERY_ITEMS_LIMIT;
+                            loadImages(loadMoreLimit);
+                        } else if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            //show error when no connection to the internet (isNetworkAvailable = false)
                         }
                     }
                 }
@@ -109,6 +116,12 @@ public final class GalleryFragment extends BaseFragment {
 
         swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
         swipeRefreshLayout.setOnRefreshListener(() -> loadImages(0));
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_LAST_SAVED_IMAGES)) {
+            Timber.i("Restoring Images from Saved State");
+            images = savedInstanceState.getParcelableArrayList(STATE_LAST_SAVED_IMAGES);
+            updateImages();
+        }
     }
 
     @Override
@@ -116,23 +129,25 @@ public final class GalleryFragment extends BaseFragment {
         super.onStart();
         if (images == null) {
             progressBar.setVisibility(View.VISIBLE);
-            loadImages(itemsLimitInc);
+            loadImages(loadMoreLimit);
         }
     }
 
-    @SuppressLint("CheckResult")
-    private void loadImages(final int itemsLimitInc) {
-        yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + itemsLimitInc, QUERY_MEDIA_TYPE, QUERY_PREVIEW_CROP, QUERY_PREVIEW_SIZE)
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        if (images != null) {
+            outState.putParcelableArrayList(STATE_LAST_SAVED_IMAGES, new ArrayList<>(images));
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    private void loadImages(final int loadMoreLimit) {
+        disposable = yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + loadMoreLimit, QUERY_MEDIA_TYPE, QUERY_PREVIEW_CROP, QUERY_PREVIEW_SIZE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe((s) -> isLoading = true)
-                .doAfterTerminate(() -> {
-                    swipeRefreshLayout.setRefreshing(false);
-                    progressBar.setVisibility(View.GONE);
-                    isLoading = false;
-                })
                 .doOnError(this::handleError)
-                .subscribe(response -> {
+                .subscribe((ImagesList response) -> {
                     images = response.getImages();
                     updateImages();
                     Timber.i("Images was loaded, rows = %d", images != null ? images.size() : -1);
@@ -140,6 +155,19 @@ public final class GalleryFragment extends BaseFragment {
     }
 
     private void updateImages() {
+
+        if (isLoading) {
+            isLoading = false;
+        }
+
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
+
         if (imageAdapter != null && images != null) {
             imageAdapter.setImages(images);
         } else {
@@ -147,12 +175,22 @@ public final class GalleryFragment extends BaseFragment {
         }
     }
 
+    //refactor
     private void handleError(final Throwable t) {
         if (t instanceof HttpException) {
             HttpException httpException = (HttpException) t;
             int code = httpException.code();
             //...
             Snackbar.make(galleryRecyclerView, httpException.message(), Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (disposable != null) {
+            disposable.dispose();
+            Timber.i("onDestroy(): disposable cleared");
         }
     }
 }

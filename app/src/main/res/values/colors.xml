@@ -12,7 +12,7 @@
     <color name="color_text_main">#FFFFFF</color>
     <color name="color_text_sub">#757575</color>
 
-    <color name="color_toolbar_transparent">#66009688</color>
+    <color name="color_toolbar_transparent">#99009688</color>
 
     <array name="swipeRefreshColors">
         <item>@color/color_accent</item>
