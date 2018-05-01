@@ -5,8 +5,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.myst3ry.yandexgallery.R;
-
-import timber.log.Timber;
+import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.AboutDialogFragment;
 
 public final class MainActivity extends BaseActivity {
 
@@ -26,7 +25,11 @@ public final class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_one:
+            case R.id.action_about:
+                //show about information dialog
+                final AboutDialogFragment fragment = new AboutDialogFragment();
+                fragment.setCancelable(true);
+                fragment.show(getSupportFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

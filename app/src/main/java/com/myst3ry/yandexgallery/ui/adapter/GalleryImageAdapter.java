@@ -1,20 +1,18 @@
 package com.myst3ry.yandexgallery.ui.adapter;
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.network.GlideApp;
-import com.myst3ry.yandexgallery.ui.activity.ImageDetailActivity;
+import com.myst3ry.yandexgallery.utils.OnImageClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +20,16 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnLongClick;
-
 
 public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapter.ImageHolder> {
 
-    private List<Image> images = new ArrayList<>();
+    private final OnImageClickListener onImageClickListener;
+    private List<Image> images;
+
+    public GalleryImageAdapter(final OnImageClickListener listener) {
+        images = new ArrayList<>();
+        onImageClickListener = listener;
+    }
 
     @Override
     public ImageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -58,26 +60,25 @@ public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImage
         notifyDataSetChanged();
     }
 
+    public void deleteImage(int position) {
+        images.remove(position);
+        notifyItemRemoved(position);
+    }
+
     private Image getImage(int position) {
         return images.get(position);
     }
 
+
     final class ImageHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.image_view) ImageView imageView;
+        @BindView(R.id.image_view)
+        ImageView imageView;
 
         @OnClick(R.id.image_view)
         public void onClick() {
-            Intent intent = new Intent(itemView.getContext(), ImageDetailActivity.class);
-            Image imageSelected = getImage(getLayoutPosition());
-            intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_DETAIL, imageSelected);
-            itemView.getContext().startActivity(intent);
-        }
-
-        @OnLongClick(R.id.image_view)
-        public boolean onLongClick() {
-            Toast.makeText(itemView.getContext(), "Long Click!", Toast.LENGTH_SHORT).show();
-            return true;
+            final int position = getLayoutPosition();
+            onImageClickListener.onClick(getImage(position), position);
         }
 
         ImageHolder(View itemView) {

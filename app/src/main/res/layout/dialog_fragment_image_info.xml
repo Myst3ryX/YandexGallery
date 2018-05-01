@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/info_container_padding_top">
+
+    <TextView
+        android:id="@+id/info_image_name"
+        style="@style/InfoTextStyle"
+        android:ellipsize="middle"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/info_image_created_date"
+        style="@style/InfoTextStyle"
+        android:ellipsize="end"
+        android:maxLines="2" />
+
+    <TextView
+        android:id="@+id/info_image_modified_date"
+        style="@style/InfoTextStyle"
+        android:ellipsize="end"
+        android:maxLines="2" />
+
+    <TextView
+        android:id="@+id/info_image_size"
+        style="@style/InfoTextStyle"
+        android:layout_marginBottom="@dimen/info_text_margin_border"
+        android:ellipsize="end"
+        android:maxLines="1" />
+
+</LinearLayout>

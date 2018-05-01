@@ -1,5 +1,6 @@
 package com.myst3ry.yandexgallery.ui.activity;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,15 +19,21 @@ import com.bumptech.glide.request.target.Target;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.network.GlideApp;
+import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.DeleteImageDialogFragment;
+import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.ImageInfoDialogFragment;
+import com.myst3ry.yandexgallery.utils.OnDeleteClickListener;
 
 import butterknife.BindView;
 import timber.log.Timber;
 
 
-public final class ImageDetailActivity extends BaseActivity {
+public final class ImageDetailActivity extends BaseActivity implements OnDeleteClickListener {
 
     public static final String EXTRA_IMAGE_DETAIL = "extra image detail";
+    public static final String EXTRA_IMAGE_POSITION = "extra image position";
+    public static final int RCODE_IMAGE_DELETE = 66;
 
+    private int position;
     private Image image;
     private String barTitle;
 
@@ -37,7 +44,9 @@ public final class ImageDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_detail);
+
         image = getIntent().getParcelableExtra(EXTRA_IMAGE_DETAIL);
+        position = getIntent().getExtras().getInt(EXTRA_IMAGE_POSITION);
 
         if (image != null) {
             barTitle = image.getImageName();
@@ -62,7 +71,25 @@ public final class ImageDetailActivity extends BaseActivity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.action_two:
+            case R.id.action_share:
+                //share image public link
+                final String downloadLink = getPublicDownloadLink();
+                final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_text), image.getImageName(), downloadLink));
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_chooser_text)));
+                return true;
+            case R.id.action_delete:
+                //show image delete confirmation dialog
+                final DeleteImageDialogFragment deleteFragment = DeleteImageDialogFragment.newInstance(image);
+                deleteFragment.setCancelable(false);
+                deleteFragment.show(getSupportFragmentManager(), null);
+                return true;
+            case R.id.action_image_info:
+                //show image additional info dialog
+                final ImageInfoDialogFragment infoFragment = ImageInfoDialogFragment.newInstance(image);
+                infoFragment.setCancelable(false);
+                infoFragment.show(getSupportFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -94,8 +121,22 @@ public final class ImageDetailActivity extends BaseActivity {
                 .into(imageLarge);
     }
 
+    private String getPublicDownloadLink() { //stub
+        return "[link]";
+    }
+
+    //delete current image
+    @Override
+    public void onDeleteConfirmClicked() {
+        final Intent deleteIntent = new Intent();
+        deleteIntent.putExtra(EXTRA_IMAGE_DETAIL, image);
+        deleteIntent.putExtra(EXTRA_IMAGE_POSITION, position);
+        setResult(RESULT_OK, deleteIntent);
+        finish();
+    }
+
     private void setUpActionBar() {
-        ActionBar bar = getSupportActionBar();
+        final ActionBar bar = getSupportActionBar();
         if (bar != null) {
             bar.setTitle(barTitle);
             bar.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.toolbar_background_translucent));

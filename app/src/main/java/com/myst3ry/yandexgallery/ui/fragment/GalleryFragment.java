@@ -1,10 +1,11 @@
 package com.myst3ry.yandexgallery.ui.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,12 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.model.ImagesList;
 import com.myst3ry.yandexgallery.network.NetworkHelper;
 import com.myst3ry.yandexgallery.network.YandexDiskApi;
+import com.myst3ry.yandexgallery.ui.activity.ImageDetailActivity;
 import com.myst3ry.yandexgallery.ui.adapter.GalleryImageAdapter;
 
 import java.util.ArrayList;
@@ -25,9 +28,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.HttpException;
 import timber.log.Timber;
 
 
@@ -36,7 +38,6 @@ public final class GalleryFragment extends BaseFragment {
     //API Query Constants (actually, they shouldn't be here :])
     private static final String QUERY_MEDIA_TYPE = "image";
     private static final String QUERY_PREVIEW_SIZE = "XL";
-    private static final boolean QUERY_PREVIEW_CROP = false;
     private static final int QUERY_ITEMS_LIMIT = 50;
 
     private static final String STATE_LAST_SAVED_IMAGES = "last saved images state";
@@ -44,7 +45,7 @@ public final class GalleryFragment extends BaseFragment {
     private List<Image> images;
     private YandexDiskApi yandexDiskApi;
     private GalleryImageAdapter imageAdapter;
-    private Disposable disposable;
+    private CompositeDisposable disposables;
 
     private int loadMoreLimit = 0;
     private boolean isLoading = false;
@@ -69,7 +70,9 @@ public final class GalleryFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         yandexDiskApi = new NetworkHelper(view.getContext()).getApi();
-        imageAdapter = new GalleryImageAdapter();
+        disposables = new CompositeDisposable();
+
+        initAdapter();
 
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         galleryRecyclerView.setLayoutManager(gridLayoutManager);
@@ -115,7 +118,7 @@ public final class GalleryFragment extends BaseFragment {
         });
 
         swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
-        swipeRefreshLayout.setOnRefreshListener(() -> loadImages(0));
+        swipeRefreshLayout.setOnRefreshListener(() -> loadImages(loadMoreLimit));
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_LAST_SAVED_IMAGES)) {
             Timber.i("Restoring Images from Saved State");
@@ -141,26 +144,58 @@ public final class GalleryFragment extends BaseFragment {
         super.onSaveInstanceState(outState);
     }
 
+    public void initAdapter() {
+        imageAdapter = new GalleryImageAdapter((image, position) -> {
+            final Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
+            intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_POSITION, position);
+            intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_DETAIL, image);
+            startActivityForResult(intent, ImageDetailActivity.RCODE_IMAGE_DELETE);
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ImageDetailActivity.RCODE_IMAGE_DELETE && resultCode == Activity.RESULT_OK) {
+            final Image image = data.getParcelableExtra(ImageDetailActivity.EXTRA_IMAGE_DETAIL);
+            final int position = data.getExtras().getInt(ImageDetailActivity.EXTRA_IMAGE_POSITION);
+
+            //delete current image from adapter and ya.disk (only to trash now)
+            if (image != null) {
+                disposables.add(yandexDiskApi.deleteImage(image.getImagePath())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        //.doOnError(this::handleError)
+                        .subscribe(() -> {
+                            Toast.makeText(getActivity().getApplicationContext(), R.string.delete_success_toast, Toast.LENGTH_SHORT).show();
+                            imageAdapter.deleteImage(position);
+                            Timber.i("Image %s successfully deleted! Position: %d", image.getImageName(), position);
+                        }, t -> Timber.e("Error: %s", t.getMessage())));
+            }
+        }
+    }
+
+    //get last uploaded images from ya.disk
     private void loadImages(final int loadMoreLimit) {
-        disposable = yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + loadMoreLimit, QUERY_MEDIA_TYPE, QUERY_PREVIEW_CROP, QUERY_PREVIEW_SIZE)
+        disposables.add(yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + loadMoreLimit, QUERY_MEDIA_TYPE, QUERY_PREVIEW_SIZE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe((s) -> isLoading = true)
-                .doOnError(this::handleError)
+                //.doOnError(this::handleError)
                 .subscribe((ImagesList response) -> {
                     images = response.getImages();
                     updateImages();
                     Timber.i("Images was loaded, rows = %d", images != null ? images.size() : -1);
-                }, t -> Timber.e("Error: %s", t.getMessage()));
+                }, t -> Timber.e("Error: %s", t.getMessage())));
     }
 
     private void updateImages() {
-
         if (isLoading) {
             isLoading = false;
         }
 
-        if (swipeRefreshLayout != null) {
+        if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(false);
         }
 
@@ -175,22 +210,26 @@ public final class GalleryFragment extends BaseFragment {
         }
     }
 
-    //refactor
-    private void handleError(final Throwable t) {
-        if (t instanceof HttpException) {
-            HttpException httpException = (HttpException) t;
-            int code = httpException.code();
-            //...
-            Snackbar.make(galleryRecyclerView, httpException.message(), Snackbar.LENGTH_LONG).show();
-        }
-    }
+//    //refactor
+//    private void handleError(final Throwable t) {
+//        Timber.e("Error: %s", t.getMessage());
+//
+//        if (t instanceof HttpException) {
+//            HttpException httpException = (HttpException) t;
+//            int code = httpException.code();
+//            //...
+//            Snackbar.make(galleryRecyclerView, httpException.message(), Snackbar.LENGTH_SHORT).show();
+//        } else {
+//            Snackbar.make(galleryRecyclerView, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+//        }
+//    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (disposable != null) {
-            disposable.dispose();
-            Timber.i("onDestroy(): disposable cleared");
+        if (disposables != null) {
+            disposables.dispose();
+            Timber.i("Destroyed. Disposables disposed.");
         }
     }
 }

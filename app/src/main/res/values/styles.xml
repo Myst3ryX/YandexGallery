@@ -6,4 +6,20 @@
         <item name="colorAccent">@color/color_accent</item>
     </style>
 
+    <style name="AppDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/color_background_secondary</item>
+        <item name="android:textColor">@color/color_text_main</item>
+        <item name="android:textColorPrimary">@color/color_text_main</item>
+    </style>
+
+    <style name="InfoTextStyle">
+        <item name="android:textColor">@color/color_text_main</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/info_text_margin_top</item>
+        <item name="android:layout_marginStart">@dimen/info_text_margin_start</item>
+        <item name="android:layout_marginEnd">@dimen/info_text_margin_border</item>
+    </style>
+
 </resources>
