@@ -19,7 +19,7 @@ public final class AboutDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity(), R.style.AppDialogTheme)
                 .setTitle(R.string.about_title)
-                .setMessage(String.format(getString(R.string.about_message), getString(R.string.about_developer)))
+                .setMessage(String.format(getString(R.string.about_message), getString(R.string.about_used_api)))
                 .setIcon(R.mipmap.ic_launcher)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
                 .create();

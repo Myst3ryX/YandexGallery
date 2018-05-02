@@ -2,6 +2,7 @@ package com.myst3ry.yandexgallery.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 public final class Image implements Parcelable {
@@ -24,8 +25,8 @@ public final class Image implements Parcelable {
     @SerializedName("preview")
     private String imagePreviewUrl;
 
-    @SerializedName("mime_type")
-    private String imageMimeType;
+    @SerializedName("public_url")
+    private String imagePublicUrl;
 
     @SerializedName("size")
     private long imageSize;
@@ -37,7 +38,7 @@ public final class Image implements Parcelable {
         imageModifiedDate = in.readString();
         imageUrl = in.readString();
         imagePreviewUrl = in.readString();
-        imageMimeType = in.readString();
+        imagePublicUrl = in.readString();
         imageSize = in.readLong();
     }
 
@@ -77,8 +78,8 @@ public final class Image implements Parcelable {
         return imagePreviewUrl;
     }
 
-    public String getImageMimeType() {
-        return imageMimeType;
+    public String getImagePublicUrl() {
+        return imagePublicUrl;
     }
 
     public long getImageSize() {
@@ -98,7 +99,7 @@ public final class Image implements Parcelable {
         dest.writeString(imageModifiedDate);
         dest.writeString(imageUrl);
         dest.writeString(imagePreviewUrl);
-        dest.writeString(imageMimeType);
+        dest.writeString(imagePublicUrl);
         dest.writeLong(imageSize);
     }
 }

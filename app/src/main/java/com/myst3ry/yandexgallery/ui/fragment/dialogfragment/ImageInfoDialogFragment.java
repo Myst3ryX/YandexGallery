@@ -32,6 +32,8 @@ public final class ImageInfoDialogFragment extends DialogFragment {
     TextView imageCreatedDate;
     @BindView(R.id.info_image_modified_date)
     TextView imageModifiedDate;
+    @BindView(R.id.info_image_is_public)
+    TextView imageIsPublic;
     @BindView(R.id.info_image_size)
     TextView imageSize;
 
@@ -59,11 +61,15 @@ public final class ImageInfoDialogFragment extends DialogFragment {
             final String name = currentImage.getImageName();
             final String created = currentImage.getImageCreatedDate();
             final String modified = currentImage.getImageModifiedDate();
+            final String isPublic = getString(currentImage.getImagePublicUrl() != null
+                    ? R.string.info_image_public_yes
+                    : R.string.info_image_public_no);
 
             imageName.setText(String.format(getString(R.string.info_image_name), name));
             imageCreatedDate.setText(String.format(getString(R.string.info_image_created_date), reformatDate(created)));
             imageModifiedDate.setText(String.format(getString(R.string.info_image_modified_date), reformatDate(modified)));
             imageSize.setText(String.format(getString(R.string.info_image_size), sizeInMegabytes));
+            imageIsPublic.setText(isPublic);
         }
 
         return new AlertDialog.Builder(getActivity(), R.style.AppDialogTheme)

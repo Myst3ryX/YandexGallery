@@ -8,7 +8,6 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface YandexDiskApi {
@@ -25,9 +24,10 @@ public interface YandexDiskApi {
     @DELETE("resources")
     Completable deleteImage(@Query("path") @NonNull final String path);
 
-    //PUT image to publish
-    @PUT("resources/publish")
-    Completable publishImage(@Query("path") @NonNull final String path);
+//    //PUT image to publish
+//    @PUT("resources/publish")
+//    Completable publishImage(@Query("path") @NonNull final String path);
+//
+//    //UPLOAD images from device
 
-    //UPLOAD image from device
 }

@@ -145,7 +145,7 @@ public final class GalleryFragment extends BaseFragment {
     }
 
     public void initAdapter() {
-        imageAdapter = new GalleryImageAdapter((image, position) -> {
+        imageAdapter = new GalleryImageAdapter((Image image, int position) -> {
             final Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
             intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_POSITION, position);
             intent.putExtra(ImageDetailActivity.EXTRA_IMAGE_DETAIL, image);

@@ -72,12 +72,8 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
                 onBackPressed();
                 return true;
             case R.id.action_share:
-                //share image public link
-                final String downloadLink = getPublicDownloadLink();
-                final Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_text), image.getImageName(), downloadLink));
-                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_chooser_text)));
+                //share image if public
+                shareImagePublicLink();
                 return true;
             case R.id.action_delete:
                 //show image delete confirmation dialog
@@ -121,11 +117,20 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
                 .into(imageLarge);
     }
 
-    private String getPublicDownloadLink() { //stub
-        return "[link]";
+    //work only with images was has already been published (publish image func will be added later)
+    private void shareImagePublicLink() {
+        final String publicUrl = image.getImagePublicUrl();
+        if (publicUrl != null) {
+            final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_text), image.getImageName(), publicUrl));
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_chooser_text)));
+        } else {
+            //show info what image is not public right now
+        }
     }
 
-    //delete current image
+    //close activity and delete current image
     @Override
     public void onDeleteConfirmClicked() {
         final Intent deleteIntent = new Intent();
