@@ -30,7 +30,6 @@ abstract class BaseActivity extends AppCompatActivity {
     private void setupToolbar() {
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            setTitle(R.string.main_activity_title);
         }
     }
 }

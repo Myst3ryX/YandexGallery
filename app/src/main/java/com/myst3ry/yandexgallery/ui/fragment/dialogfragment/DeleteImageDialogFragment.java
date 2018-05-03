@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
+import com.myst3ry.yandexgallery.BuildConfig;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.utils.OnDeleteClickListener;
@@ -18,7 +19,7 @@ import com.myst3ry.yandexgallery.utils.OnDeleteClickListener;
 
 public final class DeleteImageDialogFragment extends DialogFragment {
 
-    private static final String ARG_CURRENT_IMAGE_DELETE = "current image delete argument";
+    private static final String ARG_CURRENT_IMAGE_DELETE = BuildConfig.APPLICATION_ID + "arg.current_image_delete";
     private OnDeleteClickListener onDeleteClickListener;
 
     public static DeleteImageDialogFragment newInstance(final Image image) {

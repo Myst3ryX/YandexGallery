@@ -38,7 +38,7 @@ public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImage
 
     @Override
     public void onBindViewHolder(@NonNull ImageHolder holder, int position) {
-        Image image = getImage(position);
+        final Image image = getImage(position);
         if (image != null) {
             GlideApp.with(holder.itemView.getContext())
                     .load(image.getImagePreviewUrl())
@@ -65,7 +65,7 @@ public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImage
         notifyItemRemoved(position);
     }
 
-    private Image getImage(int position) {
+    public Image getImage(int position) {
         return images.get(position);
     }
 

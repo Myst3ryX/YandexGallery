@@ -1,5 +1,6 @@
 package com.myst3ry.yandexgallery.ui.fragment.dialogfragment;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.myst3ry.yandexgallery.BuildConfig;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 
@@ -37,7 +39,9 @@ public final class ImageInfoDialogFragment extends DialogFragment {
     @BindView(R.id.info_image_size)
     TextView imageSize;
 
-    private static final String ARG_CURRENT_IMAGE_INFO = "current image info argument";
+    private static final String ARG_CURRENT_IMAGE_INFO = BuildConfig.APPLICATION_ID + "arg.current_image_info";
+    private static final String INPUT_DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String OUTPUT_DATE_FORMAT_PATTERN = "dd.MM.yyyy HH:mm:ss";
     private Unbinder unbinder;
 
     public static ImageInfoDialogFragment newInstance(final Image image) {
@@ -50,6 +54,7 @@ public final class ImageInfoDialogFragment extends DialogFragment {
 
     @NonNull
     @Override
+    @SuppressLint("InflateParams")
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_fragment_image_info, null);
         final Image currentImage = getArguments() != null ? getArguments().getParcelable(ARG_CURRENT_IMAGE_INFO) : null;
@@ -83,8 +88,8 @@ public final class ImageInfoDialogFragment extends DialogFragment {
     //parse date to another output format
     private String reformatDate(final String dateToFormat) {
         try {
-            SimpleDateFormat inputDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
-            SimpleDateFormat outputDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.ENGLISH);
+            final SimpleDateFormat inputDate = new SimpleDateFormat(INPUT_DATE_FORMAT_PATTERN, Locale.ENGLISH);
+            final SimpleDateFormat outputDate = new SimpleDateFormat(OUTPUT_DATE_FORMAT_PATTERN, Locale.ENGLISH);
             return outputDate.format(inputDate.parse(dateToFormat));
         } catch (Exception e) {
             Timber.e("Error while parsing date: %s", e.getMessage());

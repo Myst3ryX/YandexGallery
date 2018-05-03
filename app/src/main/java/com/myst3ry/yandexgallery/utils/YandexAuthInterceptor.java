@@ -19,9 +19,9 @@ public final class YandexAuthInterceptor implements Interceptor {
     private static final String AUTH_TOKEN = BuildConfig.YANDEX_DISK_AUTH_TOKEN; //test token
 
     @Override
-    public Response intercept(@NonNull Chain chain) throws IOException {
-        Request originalRequest = chain.request();
-        Request request = originalRequest
+    public Response intercept(@NonNull final Chain chain) throws IOException {
+        final Request originalRequest = chain.request();
+        final Request request = originalRequest
                 .newBuilder()
                 .addHeader("Authorization", "OAuth " + AUTH_TOKEN)
                 .addHeader("Accept", "application/json")

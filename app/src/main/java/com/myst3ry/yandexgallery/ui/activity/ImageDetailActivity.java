@@ -16,6 +16,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.myst3ry.yandexgallery.BuildConfig;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.network.GlideApp;
@@ -29,8 +30,8 @@ import timber.log.Timber;
 
 public final class ImageDetailActivity extends BaseActivity implements OnDeleteClickListener {
 
-    public static final String EXTRA_IMAGE_DETAIL = "extra image detail";
-    public static final String EXTRA_IMAGE_POSITION = "extra image position";
+    public static final String EXTRA_IMAGE_DETAIL = BuildConfig.APPLICATION_ID + "extra.image_detail";
+    public static final String EXTRA_IMAGE_POSITION = BuildConfig.APPLICATION_ID + "extra.image_position";
     public static final int RCODE_IMAGE_DELETE = 66;
 
     private int position;
@@ -134,7 +135,6 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
     @Override
     public void onDeleteConfirmClicked() {
         final Intent deleteIntent = new Intent();
-        deleteIntent.putExtra(EXTRA_IMAGE_DETAIL, image);
         deleteIntent.putExtra(EXTRA_IMAGE_POSITION, position);
         setResult(RESULT_OK, deleteIntent);
         finish();

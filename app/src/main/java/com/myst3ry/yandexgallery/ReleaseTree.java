@@ -1,10 +1,10 @@
 package com.myst3ry.yandexgallery;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import timber.log.Timber;
-
 
 final class ReleaseTree extends Timber.Tree {
 
@@ -16,6 +16,7 @@ final class ReleaseTree extends Timber.Tree {
         return (!(priority == Log.INFO || priority == Log.VERBOSE || priority == Log.DEBUG));
     }
 
+    @SuppressLint("LogNotTimber")
     @Override
     protected void log(int priority, String tag, @NonNull String message, Throwable t) {
         if (isLoggable(tag, priority)) {

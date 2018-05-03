@@ -1,7 +1,6 @@
 <resources>
 
     <string name="app_name">Я.Галерея</string>
-    <string name="main_activity_title">Ваша галерея</string>
     <string name="large_image_content_desc">Оригинальное изображение</string>
 
     <!--Action Menus-->
@@ -22,7 +21,7 @@
     <!--Delete Dialog-->
     <string name="delete_image_title">Удалить %s?</string>
     <string name="delete_image_message">Изображение будет удалено в вашу Корзину</string>
-    <string name="delete_success_toast">Изоражение успешно удалено!</string>
+    <string name="delete_success_toast">Изоражение удалено</string>
 
     <!--Info Dialog-->
     <string name="info_image_title">Информация</string>
