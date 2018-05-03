@@ -12,8 +12,11 @@ import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
+import com.myst3ry.yandexgallery.YandexGalleryApp;
 
 import java.io.InputStream;
+
+import javax.inject.Inject;
 
 import okhttp3.OkHttpClient;
 
@@ -24,6 +27,9 @@ import okhttp3.OkHttpClient;
 @GlideModule
 public final class GalleryGlideModule extends AppGlideModule {
 
+    @Inject
+    OkHttpClient okHttpClient;
+
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
         super.applyOptions(context, builder);
@@ -33,7 +39,7 @@ public final class GalleryGlideModule extends AppGlideModule {
 
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
-        OkHttpClient okHttpClient = new NetworkHelper(context).getOkHttpClient();
+        YandexGalleryApp.getNetworkComponent().inject(this);
         //replace default networking logic to okhttp
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(okHttpClient));
     }

@@ -16,9 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.myst3ry.yandexgallery.R;
+import com.myst3ry.yandexgallery.YandexGalleryApp;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.model.ImagesList;
-import com.myst3ry.yandexgallery.network.NetworkHelper;
 import com.myst3ry.yandexgallery.network.YandexDiskApi;
 import com.myst3ry.yandexgallery.ui.activity.ImageDetailActivity;
 import com.myst3ry.yandexgallery.ui.adapter.GalleryImageAdapter;
@@ -26,12 +26,13 @@ import com.myst3ry.yandexgallery.ui.adapter.GalleryImageAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
-
 
 public final class GalleryFragment extends BaseFragment {
 
@@ -42,8 +43,10 @@ public final class GalleryFragment extends BaseFragment {
 
     private static final String STATE_LAST_SAVED_IMAGES = "last saved images state";
 
+    @Inject
+    YandexDiskApi yandexDiskApi;
+
     private List<Image> images;
-    private YandexDiskApi yandexDiskApi;
     private GalleryImageAdapter imageAdapter;
     private CompositeDisposable disposables;
 
@@ -60,6 +63,14 @@ public final class GalleryFragment extends BaseFragment {
     SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        disposables = new CompositeDisposable();
+        YandexGalleryApp.getNetworkComponent().inject(this);
+        initAdapter();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_gallery, container, false);
@@ -68,11 +79,6 @@ public final class GalleryFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        yandexDiskApi = new NetworkHelper(view.getContext()).getApi();
-        disposables = new CompositeDisposable();
-
-        initAdapter();
 
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         galleryRecyclerView.setLayoutManager(gridLayoutManager);
@@ -168,7 +174,7 @@ public final class GalleryFragment extends BaseFragment {
                         .observeOn(AndroidSchedulers.mainThread())
                         //.doOnError(this::handleError)
                         .subscribe(() -> {
-                            Toast.makeText(getActivity().getApplicationContext(), R.string.delete_success_toast, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.delete_success_toast, Toast.LENGTH_SHORT).show();
                             imageAdapter.deleteImage(position);
                             Timber.i("Image %s successfully deleted! Position: %d", image.getImageName(), position);
                         }, t -> Timber.e("Error: %s", t.getMessage())));
