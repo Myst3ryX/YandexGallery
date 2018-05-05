@@ -39,7 +39,7 @@ public final class GalleryGlideModule extends AppGlideModule {
 
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
-        YandexGalleryApp.getNetworkComponent().inject(this);
+        YandexGalleryApp.getNetworkComponent(context).inject(this);
         //replace default networking logic to okhttp
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(okHttpClient));
     }

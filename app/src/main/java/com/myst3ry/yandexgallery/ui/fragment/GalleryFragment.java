@@ -68,7 +68,7 @@ public final class GalleryFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        YandexGalleryApp.getNetworkComponent().inject(this);
+        YandexGalleryApp.getNetworkComponent(getActivity()).inject(this);
         disposables = new CompositeDisposable();
     }
 
@@ -121,7 +121,7 @@ public final class GalleryFragment extends BaseFragment {
     }
 
     private void prepareRecyclerView() {
-        final GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         galleryRecyclerView.setLayoutManager(gridLayoutManager);
         galleryRecyclerView.setAdapter(imageAdapter);
         galleryRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -141,7 +141,7 @@ public final class GalleryFragment extends BaseFragment {
                     fabAddImages.show();
                 }
 
-                //simple and terrible pagination without offset query
+                //simple and terrible pagination where no offset query
                 if (dy > 0) {
                     int visibleItemCount = gridLayoutManager.getChildCount();
                     int totalItemCount = gridLayoutManager.getItemCount();
@@ -184,7 +184,7 @@ public final class GalleryFragment extends BaseFragment {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {
-                            Toast.makeText(getContext(), R.string.delete_success_toast, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.delete_success_toast, Toast.LENGTH_SHORT).show();
                             imageAdapter.deleteImage(position);
                             Timber.i("Image %s was deleted. Position: %d", image.getImageName(), position);
                         }, t -> Timber.e("Error: %s", t.getMessage())));

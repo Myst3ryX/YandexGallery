@@ -1,6 +1,7 @@
 package com.myst3ry.yandexgallery;
 
 import android.app.Application;
+import android.content.Context;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -8,6 +9,8 @@ import android.text.TextUtils;
 import com.myst3ry.yandexgallery.network.DaggerNetworkComponent;
 import com.myst3ry.yandexgallery.network.NetworkComponent;
 import com.myst3ry.yandexgallery.network.NetworkModule;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import timber.log.Timber;
 
@@ -15,13 +18,15 @@ public final class YandexGalleryApp extends Application {
 
     public static final String AUTH_TOKEN = "auth_token";
 
-    private static NetworkComponent networkComponent;
+    private NetworkComponent networkComponent;
+    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
         super.onCreate();
         configureTimber();
         configureDaggerComponents();
+        configureLeakCanary();
     }
 
     private void configureTimber() {
@@ -46,8 +51,19 @@ public final class YandexGalleryApp extends Application {
                 .build();
     }
 
-    public static NetworkComponent getNetworkComponent() {
-        return networkComponent;
+    private void configureLeakCanary() {
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return;
+        }
+        refWatcher = LeakCanary.install(this);
+    }
+
+    public static NetworkComponent getNetworkComponent(Context context) {
+        return ((YandexGalleryApp) context.getApplicationContext()).networkComponent;
+    }
+
+    public static RefWatcher getRefWatcher(Context context) {
+        return ((YandexGalleryApp) context.getApplicationContext()).refWatcher;
     }
 
     public void saveAuthToken(String authToken) {

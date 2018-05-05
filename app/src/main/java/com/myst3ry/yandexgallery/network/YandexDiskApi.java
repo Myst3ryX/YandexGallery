@@ -24,10 +24,4 @@ public interface YandexDiskApi {
     @DELETE("resources")
     Completable deleteImage(@Query("path") @NonNull final String path);
 
-//    //PUT image to publish
-//    @PUT("resources/publish")
-//    Completable publishImage(@Query("path") @NonNull final String path);
-//
-//    //UPLOAD images from device
-
 }
