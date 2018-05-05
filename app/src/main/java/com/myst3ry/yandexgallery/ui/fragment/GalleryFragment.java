@@ -3,6 +3,7 @@ package com.myst3ry.yandexgallery.ui.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -39,16 +40,18 @@ public final class GalleryFragment extends BaseFragment {
 
     private static final String QUERY_MEDIA_TYPE = "image";
     private static final String QUERY_PREVIEW_SIZE = "XL";
-    private static final int QUERY_ITEMS_LIMIT = 50;
+    private static final int QUERY_ITEMS_LIMIT = 300;
 
-    private static final String STATE_LAST_SAVED_IMAGES = BuildConfig.APPLICATION_ID + "state.last_saved_images";
+    private static final String STATE_SAVED_IMAGES = BuildConfig.APPLICATION_ID + "state.saved_images";
+    private static final String STATE_SAVED_LIMIT = BuildConfig.APPLICATION_ID + "state.saved_limit";
+    private static final String STATE_SAVED_LAYOUT_MANAGER = BuildConfig.APPLICATION_ID + "state.saved_layout_manager";
 
     private List<Image> images;
     private GalleryImageAdapter imageAdapter;
     private CompositeDisposable disposables;
-
-    private int loadMoreLimit = 0;
-    private boolean isLoading = false;
+    private Parcelable layoutManagerSavedState;
+    private boolean isLoading;
+    private int loadMoreLimit;
 
     @Inject
     YandexDiskApi yandexDiskApi;
@@ -65,9 +68,8 @@ public final class GalleryFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        disposables = new CompositeDisposable();
         YandexGalleryApp.getNetworkComponent().inject(this);
-        initAdapter();
+        disposables = new CompositeDisposable();
     }
 
     @Override
@@ -79,6 +81,7 @@ public final class GalleryFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initAdapter();
         prepareRecyclerView();
 
         swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
@@ -88,9 +91,12 @@ public final class GalleryFragment extends BaseFragment {
             //add new images from device to the gallery
         });
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_LAST_SAVED_IMAGES)) {
-            Timber.i("Restoring Images from Saved State");
-            images = savedInstanceState.getParcelableArrayList(STATE_LAST_SAVED_IMAGES);
+        //restore saved state
+        if (savedInstanceState != null) {
+            Timber.i("Restoring from saved state");
+            images = savedInstanceState.getParcelableArrayList(STATE_SAVED_IMAGES);
+            layoutManagerSavedState = savedInstanceState.getParcelable(STATE_SAVED_LAYOUT_MANAGER);
+            loadMoreLimit = savedInstanceState.getInt(STATE_SAVED_LIMIT);
             updateImages();
         }
     }
@@ -102,14 +108,6 @@ public final class GalleryFragment extends BaseFragment {
             progressBar.setVisibility(View.VISIBLE);
             loadImages(loadMoreLimit);
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        if (images != null) {
-            outState.putParcelableArrayList(STATE_LAST_SAVED_IMAGES, new ArrayList<>(images));
-        }
-        super.onSaveInstanceState(outState);
     }
 
     //init adapter with OnImageClickListener anonymous class
@@ -143,23 +141,33 @@ public final class GalleryFragment extends BaseFragment {
                     fabAddImages.show();
                 }
 
-                //simple pagination
+                //simple and terrible pagination without offset query
                 if (dy > 0) {
                     int visibleItemCount = gridLayoutManager.getChildCount();
                     int totalItemCount = gridLayoutManager.getItemCount();
                     int pastVisibleItems = gridLayoutManager.findFirstVisibleItemPosition();
-
                     if (!isLoading) {
-                        if ((visibleItemCount + pastVisibleItems + 20) == totalItemCount) {
+                        if (visibleItemCount + pastVisibleItems + 20 >= totalItemCount) {
                             loadMoreLimit += QUERY_ITEMS_LIMIT;
                             loadImages(loadMoreLimit);
-                        } else if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                            //show error when no connection to the internet (isNetworkAvailable = false)
                         }
                     }
                 }
             }
         });
+    }
+
+    //get last uploaded images from ya.disk
+    private void loadImages(final int loadMoreLimit) {
+        disposables.add(yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + loadMoreLimit, QUERY_MEDIA_TYPE, QUERY_PREVIEW_SIZE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe((s) -> isLoading = true)
+                .subscribe((ImagesList response) -> {
+                    images = response.getImages();
+                    updateImages();
+                    Timber.i("Images was loaded, rows = %d", images != null ? images.size() : -1);
+                }, t -> Timber.e("Error: %s", t.getMessage())));
     }
 
     @Override
@@ -184,19 +192,6 @@ public final class GalleryFragment extends BaseFragment {
         }
     }
 
-    //get last uploaded images from ya.disk
-    private void loadImages(final int loadMoreLimit) {
-        disposables.add(yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + loadMoreLimit, QUERY_MEDIA_TYPE, QUERY_PREVIEW_SIZE)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe((s) -> isLoading = true)
-                .subscribe((ImagesList response) -> {
-                    images = response.getImages();
-                    updateImages();
-                    Timber.i("Images was loaded, rows = %d", images != null ? images.size() : -1);
-                }, t -> Timber.e("Error: %s", t.getMessage())));
-    }
-
     private void updateImages() {
         if (isLoading) {
             isLoading = false;
@@ -212,6 +207,7 @@ public final class GalleryFragment extends BaseFragment {
 
         if (imageAdapter != null && images != null) {
             imageAdapter.setImages(images);
+            restoreLayoutManagerPosition();
         } else {
             //show error or empty text
         }
@@ -229,6 +225,26 @@ public final class GalleryFragment extends BaseFragment {
 //            Snackbar.make(galleryRecyclerView, t.getMessage(), Snackbar.LENGTH_SHORT).show();
 //        }
 //    }
+
+    private void restoreLayoutManagerPosition() {
+        if (layoutManagerSavedState != null) {
+            galleryRecyclerView.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
+            layoutManagerSavedState = null;
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        if (galleryRecyclerView != null) {
+            outState.putParcelable(STATE_SAVED_LAYOUT_MANAGER, galleryRecyclerView.getLayoutManager().onSaveInstanceState());
+        }
+        if (images != null) {
+            outState.putParcelableArrayList(STATE_SAVED_IMAGES, new ArrayList<>(images));
+        }
+        if (loadMoreLimit != 0) {
+            outState.putInt(STATE_SAVED_LIMIT, loadMoreLimit);
+        }
+    }
 
     @Override
     public void onDestroy() {

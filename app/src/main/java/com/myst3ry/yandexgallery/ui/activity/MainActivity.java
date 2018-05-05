@@ -31,7 +31,9 @@ public final class MainActivity extends BaseActivity {
             onFirstLogin();
         }
 
-        showContent();
+        if (savedInstanceState == null) {
+            showContent();
+        }
     }
 
     @Override
