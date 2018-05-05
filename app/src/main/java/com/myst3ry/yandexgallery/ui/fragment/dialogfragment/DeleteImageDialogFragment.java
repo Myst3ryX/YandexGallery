@@ -11,7 +11,7 @@ import android.support.v7.app.AlertDialog;
 import com.myst3ry.yandexgallery.BuildConfig;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
-import com.myst3ry.yandexgallery.utils.OnDeleteClickListener;
+import com.myst3ry.yandexgallery.utils.listeners.OnDeleteClickListener;
 
 /*
  * DeleteImageDialogFragment used to displayed the delete confirmation

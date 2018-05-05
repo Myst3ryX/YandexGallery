@@ -4,15 +4,22 @@
     <string name="large_image_content_desc">Оригинальное изображение</string>
 
     <!--Action Menus-->
+    <string name="action_logout">Выйти</string>
     <string name="action_about">О программе</string>
     <string name="action_share">Поделиться</string>
     <string name="action_delete">Удалить</string>
     <string name="action_image_info">Информация</string>
 
+    <!--Auth Dialog-->
+    <string name="auth_title">Требуется авторизация</string>
+    <string name="auth_message">Для работы с приложением вам необходимо войти в свою учетную запись Яндекс.
+        \n\nАвторизация будет выполнена в браузере. Продолжить?</string>
+    <string name="auth_exit_btn">Выход</string>
+
     <!--About Dialog-->
     <string name="about_title">О Программе</string>
-    <string name="about_message">Приложение Я.Галерея было разработано в соответствии с заданием Школы мобильной разработки Яндекс в 2018 году%s</string>
-    <string name="about_used_api">\n\nЭто приложение использует Яндекс.Диск REST API</string>
+    <string name="about_message">Приложение Я.Галерея было разработано в соответствии с заданием Школы мобильной разработки Яндекс в 2018 году.%s</string>
+    <string name="about_used_api">\n\nЭто приложение использует Яндекс.Диск REST API.</string>
 
     <!--Share-->
     <string name="share_text">Вы можете загрузить изображение\n%s\nпо ссылке:\n%s</string>
@@ -40,5 +47,7 @@
     <string name="error_load_image">Ошибка во время загрузки изображения</string>
     <string name="error_delete_image">Ошибка при удалении изображения</string>
     <string name="error_not_public_image">Нельзя поделиться не публичным изображением</string>
+
+    <!--Temp-->
 
 </resources>

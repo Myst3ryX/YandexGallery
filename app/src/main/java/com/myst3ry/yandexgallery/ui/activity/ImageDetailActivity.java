@@ -22,7 +22,7 @@ import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.network.GlideApp;
 import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.DeleteImageDialogFragment;
 import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.ImageInfoDialogFragment;
-import com.myst3ry.yandexgallery.utils.OnDeleteClickListener;
+import com.myst3ry.yandexgallery.utils.listeners.OnDeleteClickListener;
 
 import butterknife.BindView;
 import timber.log.Timber;

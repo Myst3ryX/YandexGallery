@@ -11,15 +11,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /*
- * OkHttp Interceptor for supporting offline cache
+ * Interceptor for supporting offline okhttp cache
  */
 
 public final class OfflineCacheControlInterceptor implements Interceptor {
 
     private final Context appContext;
 
-    public OfflineCacheControlInterceptor(final Application app) {
-        this.appContext = app.getApplicationContext();
+    public OfflineCacheControlInterceptor(final Application application) {
+        this.appContext = application.getApplicationContext();
     }
 
     @Override

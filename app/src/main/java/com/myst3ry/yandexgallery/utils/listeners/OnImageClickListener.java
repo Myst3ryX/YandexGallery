@@ -1,4 +1,4 @@
-package com.myst3ry.yandexgallery.utils;
+package com.myst3ry.yandexgallery.utils.listeners;
 
 import android.support.annotation.NonNull;
 

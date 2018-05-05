@@ -16,10 +16,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-
-        buildTypes.each {
-            it.buildConfigField 'String', 'YANDEX_DISK_AUTH_TOKEN', YandexDiskAuthToken
-        }
     }
 
     compileOptions {

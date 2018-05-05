@@ -12,7 +12,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.model.Image;
 import com.myst3ry.yandexgallery.network.GlideApp;
-import com.myst3ry.yandexgallery.utils.OnImageClickListener;
+import com.myst3ry.yandexgallery.utils.listeners.OnImageClickListener;
 
 import java.util.ArrayList;
 import java.util.List;

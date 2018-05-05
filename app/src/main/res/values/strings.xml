@@ -4,15 +4,23 @@
     <string name="large_image_content_desc">Original Image</string>
 
     <!--Action Menus-->
+    <string name="action_logout">Logout</string>
     <string name="action_about">About</string>
     <string name="action_share">Share</string>
     <string name="action_delete">Delete</string>
     <string name="action_image_info">Information</string>
 
+    <!--Auth Dialog-->
+    <string name="auth_title">Authorization required</string>
+    <string name="auth_message">To work with the application you need to log in your Yandex account.
+        \n\nContinue in browser?</string>
+    <string name="auth_exit_btn">Exit</string>
+
     <!--About Dialog-->
     <string name="about_title">About</string>
-    <string name="about_message">Ya.Gallery Application was developed in accordance with the task of the Yandex School of Mobile Development in 2018%s</string>
-    <string name="about_used_api">\n\nThis Application uses Yandex.Disk REST API</string>
+    <string name="about_message">Ya.Gallery Application was developed in accordance with
+        the task of the Yandex School of Mobile Development in 2018.%s</string>
+    <string name="about_used_api">\n\nThis Application uses Yandex.Disk REST API.</string>
 
     <!--Share-->
     <string name="share_text">You can download image\n%s\nvia link:\n%s</string>
@@ -40,5 +48,7 @@
     <string name="error_load_image">Error while loading image</string>
     <string name="error_delete_image">Error while deleting image</string>
     <string name="error_not_public_image">Image is not public and cannot be shared</string>
+
+    <!--Temp-->
 
 </resources>

@@ -42,7 +42,7 @@ public final class NetworkModule {
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(BuildConfig.DEBUG
                         ? HttpLoggingInterceptor.Level.BASIC
                         : HttpLoggingInterceptor.Level.NONE))
-                .addInterceptor(new YandexAuthInterceptor())
+                .addInterceptor(new YandexAuthInterceptor(application))
                 .addInterceptor(new OfflineCacheControlInterceptor(application))
                 .addNetworkInterceptor(new OfflineCacheControlInterceptor(application))
                 .cache(httpCache)
