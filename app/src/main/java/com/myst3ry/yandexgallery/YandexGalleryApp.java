@@ -2,16 +2,21 @@ package com.myst3ry.yandexgallery;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.livefront.bridge.Bridge;
+import com.livefront.bridge.SavedStateHandler;
 import com.myst3ry.yandexgallery.network.DaggerNetworkComponent;
 import com.myst3ry.yandexgallery.network.NetworkComponent;
 import com.myst3ry.yandexgallery.network.NetworkModule;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
+import icepick.Icepick;
 import timber.log.Timber;
 
 public final class YandexGalleryApp extends Application {
@@ -25,8 +30,9 @@ public final class YandexGalleryApp extends Application {
     public void onCreate() {
         super.onCreate();
         configureTimber();
-        configureDaggerComponents();
-        configureLeakCanary();
+        prepareDaggerComponents();
+        installLeakCanary();
+        initBridge();
     }
 
     private void configureTimber() {
@@ -44,18 +50,32 @@ public final class YandexGalleryApp extends Application {
         }
     }
 
-    private void configureDaggerComponents() {
+    private void prepareDaggerComponents() {
         networkComponent = DaggerNetworkComponent.builder()
                 .appModule(new AppModule(this))
                 .networkModule(new NetworkModule())
                 .build();
     }
 
-    private void configureLeakCanary() {
+    private void installLeakCanary() {
         if (LeakCanary.isInAnalyzerProcess(this)) {
             return;
         }
         refWatcher = LeakCanary.install(this);
+    }
+
+    private void initBridge() {
+        Bridge.initialize(getApplicationContext(), new SavedStateHandler() {
+            @Override
+            public void saveInstanceState(@NonNull Object target, @NonNull Bundle state) {
+                Icepick.saveInstanceState(target, state);
+            }
+
+            @Override
+            public void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
+                Icepick.restoreInstanceState(target, state);
+            }
+        });
     }
 
     public static NetworkComponent getNetworkComponent(Context context) {
