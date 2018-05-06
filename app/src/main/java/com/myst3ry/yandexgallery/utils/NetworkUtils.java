@@ -13,6 +13,7 @@ public final class NetworkUtils {
     public static boolean isNetworkAvailable(final Context context) {
         final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+
         return (activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting());
     }
 

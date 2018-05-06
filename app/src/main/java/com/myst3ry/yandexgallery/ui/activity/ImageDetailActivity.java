@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
@@ -53,9 +54,8 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
             barTitle = image.getImageName();
             loadImage();
         } else {
-            //show error that image can't be shown
+            showToast(getString(R.string.error_no_image));
         }
-
         setUpActionBar();
     }
 
@@ -104,7 +104,9 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        //show Toast or Snackbar for image loading/no connection error here
+                        final Snackbar snackbar = Snackbar.make(imageLarge, R.string.error_check_internet, Snackbar.LENGTH_INDEFINITE);
+                        snackbar.setAction(R.string.error_retry_btn, v -> loadImage());
+                        snackbar.show();
                         Timber.e("Full sized Image loading error %s", e != null ? e.getMessage() : null);
                         return false;
                     }
@@ -118,7 +120,7 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
                 .into(imageLarge);
     }
 
-    //work only with images was has already been published (publish image func will be added later)
+    //only shares images that's already has been published (publish image func will be added later)
     private void shareImagePublicLink() {
         final String publicUrl = image.getImagePublicUrl();
         if (publicUrl != null) {
@@ -127,7 +129,7 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
             shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_text), image.getImageName(), publicUrl));
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_chooser_text)));
         } else {
-            //show info what image is not public right now
+            showLongToast(getString(R.string.error_not_public_image));
         }
     }
 

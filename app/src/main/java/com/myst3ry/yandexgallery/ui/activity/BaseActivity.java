@@ -4,6 +4,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.YandexGalleryApp;
@@ -42,5 +43,13 @@ abstract class BaseActivity extends AppCompatActivity {
         //watch memory leaks
         RefWatcher refWatcher = YandexGalleryApp.getRefWatcher(this);
         refWatcher.watch(this);
+    }
+
+    protected void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    protected void showLongToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

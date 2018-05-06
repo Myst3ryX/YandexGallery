@@ -100,6 +100,7 @@ public final class ImageInfoDialogFragment extends DialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        //ButterKnife unbinds
         unbinder.unbind();
     }
 }

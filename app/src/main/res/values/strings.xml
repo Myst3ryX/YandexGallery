@@ -1,7 +1,7 @@
 <resources>
 
     <string name="app_name">Ya.Gallery</string>
-    <string name="large_image_content_desc">Original Image</string>
+    <string name="large_image_content_desc">Original image</string>
 
     <!--Action Menus-->
     <string name="action_logout">Logout</string>
@@ -28,7 +28,7 @@
 
     <!--Delete Dialog-->
     <string name="delete_image_title">Delete %s?</string>
-    <string name="delete_image_message">Image will be placed in your trash folder</string>
+    <string name="delete_image_message">Image will be placed in your Yandex.Disk Trash Folder</string>
     <string name="delete_success_toast">Image was deleted</string>
 
     <!--Info Dialog-->
@@ -41,14 +41,14 @@
     <string name="info_image_size">Size: %.2f Mb</string>
 
     <!--Errors-->
-    <string name="error">Error</string>
-    <string name="error_no_data">Nothing to show</string>
-    <string name="error_no_connection">No Connection</string>
-    <string name="error_empty_list">No images in your Gallery</string>
-    <string name="error_load_image">Error while loading image</string>
+    <string name="error">Error: %d</string>
+    <string name="error_retry_btn">Retry</string>
+    <string name="error_auth">Authorization error</string>
+    <string name="error_no_connection">No connection</string>
+    <string name="error_no_image">Oops! No image to show :(</string>
+    <string name="error_empty_text">No images in your Gallery</string>
     <string name="error_delete_image">Error while deleting image</string>
+    <string name="error_check_internet">Please, check your internet connection</string>
     <string name="error_not_public_image">Image is not public and cannot be shared</string>
-
-    <!--Temp-->
 
 </resources>

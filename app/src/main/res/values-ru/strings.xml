@@ -18,7 +18,8 @@
 
     <!--About Dialog-->
     <string name="about_title">О Программе</string>
-    <string name="about_message">Приложение Я.Галерея было разработано в соответствии с заданием Школы мобильной разработки Яндекс в 2018 году.%s</string>
+    <string name="about_message">Приложение Я.Галерея было разработано в соответствии
+        с заданием Школы мобильной разработки Яндекс в 2018 году.%s</string>
     <string name="about_used_api">\n\nЭто приложение использует Яндекс.Диск REST API.</string>
 
     <!--Share-->
@@ -27,7 +28,7 @@
 
     <!--Delete Dialog-->
     <string name="delete_image_title">Удалить %s?</string>
-    <string name="delete_image_message">Изображение будет удалено в вашу Корзину</string>
+    <string name="delete_image_message">Изображение будет удалено в вашу корзину Яндекс.Диска</string>
     <string name="delete_success_toast">Изоражение удалено</string>
 
     <!--Info Dialog-->
@@ -40,14 +41,14 @@
     <string name="info_image_size">Размер: %.2f Мб</string>
 
     <!--Errors-->
-    <string name="error">Ошибка</string>
-    <string name="error_no_data">Нет данных</string>
+    <string name="error">Ошибка: %d</string>
+    <string name="error_retry_btn">Повторить</string>
+    <string name="error_auth">Ошибка авторизации</string>
     <string name="error_no_connection">Нет соединения</string>
-    <string name="error_empty_list">Ваша галерея пуста</string>
-    <string name="error_load_image">Ошибка во время загрузки изображения</string>
+    <string name="error_no_image">Упс! Изображение куда-то пропало :(</string>
+    <string name="error_empty_text">В Вашей галерее нет изображений</string>
     <string name="error_delete_image">Ошибка при удалении изображения</string>
+    <string name="error_check_internet">Пожалуйста, проверьте свое соединение с интернетом</string>
     <string name="error_not_public_image">Нельзя поделиться не публичным изображением</string>
-
-    <!--Temp-->
 
 </resources>

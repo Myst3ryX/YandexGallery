@@ -1,8 +1,6 @@
 package com.myst3ry.yandexgallery.ui.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +15,10 @@ import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.AuthDialogFragment;
 
 public final class AuthFragment extends BaseFragment {
 
-    public static final String ARG_AUTH_URL = BuildConfig.APPLICATION_ID + "arg.auth_url";
-
     private static final String AUTH_URL = "https://oauth.yandex.ru/authorize?response_type=token&client_id=";
     private static final String AUTH_QUERY_CLIENT_ID = "36b72804b7b341f5b0301b22325f7c66";
+
+    public static final String ARG_AUTH_URL = BuildConfig.APPLICATION_ID + "arg.auth_url";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,8 +27,8 @@ public final class AuthFragment extends BaseFragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onResume() {
+        super.onResume();
 
         final Bundle args = new Bundle();
         args.putString(ARG_AUTH_URL, getAuthUrl());

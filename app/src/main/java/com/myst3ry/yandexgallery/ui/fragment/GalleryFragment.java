@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.YandexGalleryApp;
@@ -22,6 +21,7 @@ import com.myst3ry.yandexgallery.model.ImagesList;
 import com.myst3ry.yandexgallery.network.YandexDiskApi;
 import com.myst3ry.yandexgallery.ui.activity.ImageDetailActivity;
 import com.myst3ry.yandexgallery.ui.adapter.GalleryImageAdapter;
+import com.myst3ry.yandexgallery.utils.NetworkUtils;
 
 import java.util.ArrayList;
 
@@ -32,7 +32,12 @@ import icepick.State;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 import timber.log.Timber;
+
+/*
+ * GalleryFragment used to displayed the main content of images loaded from Yandex.Disk
+ */
 
 public final class GalleryFragment extends BaseFragment {
 
@@ -42,6 +47,7 @@ public final class GalleryFragment extends BaseFragment {
 
     private GalleryImageAdapter imageAdapter;
     private CompositeDisposable disposables;
+
     @State
     ArrayList<Image> images;
     @State
@@ -51,12 +57,12 @@ public final class GalleryFragment extends BaseFragment {
     @Inject
     YandexDiskApi yandexDiskApi;
 
-    @BindView(R.id.fab_add_images)
-    FloatingActionButton fabAddImages;
     @BindView(R.id.gallery_rec_view)
     RecyclerView galleryRecyclerView;
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
+    @BindView(R.id.empty_text)
+    TextView emptyText;
     @BindView(R.id.refresher)
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -85,7 +91,7 @@ public final class GalleryFragment extends BaseFragment {
         //restore saved state
         if (savedInstanceState != null) {
             Timber.i("Restoring from saved state");
-            updateImages();
+            updateUI();
         }
     }
 
@@ -121,23 +127,20 @@ public final class GalleryFragment extends BaseFragment {
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                //hide fab with scrolling down and show with scrolling up
-                if (dy > 0 && fabAddImages.isShown()) {
-                    fabAddImages.hide();
-                } else if (dy < 0 && !fabAddImages.isShown()) {
-                    fabAddImages.show();
-                }
-
                 //simple and terrible pagination where no offset query
                 if (dy > 0) {
                     int visibleItemCount = gridLayoutManager.getChildCount();
                     int totalItemCount = gridLayoutManager.getItemCount();
                     int pastVisibleItems = gridLayoutManager.findFirstVisibleItemPosition();
                     if (!isLoading) {
-                        if (visibleItemCount + pastVisibleItems + 20 >= totalItemCount) {
+                        if ((visibleItemCount + pastVisibleItems + 20) >= totalItemCount) {
                             loadMoreLimit += QUERY_ITEMS_LIMIT;
                             loadImages(loadMoreLimit);
+                        }
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            if (!NetworkUtils.isNetworkAvailable(getActivity())) {
+                                showToast(getString(R.string.error_no_connection));
+                            }
                         }
                     }
                 }
@@ -147,15 +150,25 @@ public final class GalleryFragment extends BaseFragment {
 
     //get last uploaded images from ya.disk
     private void loadImages(final int loadMoreLimit) {
-        disposables.add(yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + loadMoreLimit, QUERY_MEDIA_TYPE, QUERY_PREVIEW_SIZE)
+        disposables.add(yandexDiskApi.getLastUploadedImages(QUERY_ITEMS_LIMIT + loadMoreLimit,
+                QUERY_MEDIA_TYPE, QUERY_PREVIEW_SIZE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe((s) -> isLoading = true)
                 .subscribe((ImagesList response) -> {
                     images = new ArrayList<>(response.getImages());
-                    updateImages();
-                    Timber.i("Images was loaded, rows = %d", images != null ? images.size() : -1);
-                }, t -> Timber.e("Error: %s", t.getMessage())));
+                    updateUI();
+                    Timber.i("Images was loaded successful");
+                }, t -> {
+                    if (t instanceof HttpException) {
+                        final HttpException http = (HttpException) t;
+                        if (NetworkUtils.isNetworkAvailable(getActivity())) {
+                            showToast(String.format(getString(R.string.error), http.code()));
+                        }
+                    }
+                    updateUI();
+                    Timber.e("Error while loading main content: %s", t.getMessage());
+                }));
     }
 
     @Override
@@ -172,15 +185,21 @@ public final class GalleryFragment extends BaseFragment {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {
-                            Toast.makeText(getActivity(), R.string.delete_success_toast, Toast.LENGTH_SHORT).show();
+                            showToast(getString(R.string.delete_success_toast));
                             imageAdapter.deleteImage(position);
+                            if (imageAdapter.getItemCount() == 0) {
+                                updateUI();
+                            }
                             Timber.i("Image %s was deleted. Position: %d", image.getImageName(), position);
-                        }, t -> Timber.e("Error: %s", t.getMessage())));
+                        }, t -> {
+                            showToast(getString(R.string.error_delete_image));
+                            Timber.e("Image not deleted, cuz: %s", t.getMessage());
+                        }));
             }
         }
     }
 
-    private void updateImages() {
+    private void updateUI() {
         if (isLoading) {
             isLoading = false;
         }
@@ -193,29 +212,23 @@ public final class GalleryFragment extends BaseFragment {
             progressBar.setVisibility(View.GONE);
         }
 
-        if (imageAdapter != null && images != null) {
+        if (emptyText != null) {
+            if (images != null && images.isEmpty()) {
+                emptyText.setVisibility(View.VISIBLE);
+            } else {
+                emptyText.setVisibility(View.GONE);
+            }
+        }
+
+        if (images != null && imageAdapter != null) {
             imageAdapter.setImages(images);
-        } else {
-            //show error or empty text
         }
     }
-
-//    private void handleError(final Throwable t) {
-//        Timber.e("Error: %s", t.getMessage());
-//
-//        if (t instanceof HttpException) {
-//            HttpException httpException = (HttpException) t;
-//            int code = httpException.code();
-//            //...
-//            Snackbar.make(galleryRecyclerView, httpException.message(), Snackbar.LENGTH_SHORT).show();
-//        } else {
-//            Snackbar.make(galleryRecyclerView, t.getMessage(), Snackbar.LENGTH_SHORT).show();
-//        }
-//    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        //dispose all Rx Disposable's
         if (disposables != null) {
             disposables.dispose();
         }

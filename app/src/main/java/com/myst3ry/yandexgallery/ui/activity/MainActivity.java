@@ -64,8 +64,6 @@ public final class MainActivity extends BaseActivity {
     private void onFirstLogin() {
         Uri data = getIntent().getData();
         if (data != null) {
-            Timber.i("Intent received");
-
             final Pattern pattern = Pattern.compile("access_token=(.*?)(&|$)");
             final Matcher matcher = pattern.matcher(data.toString());
 
@@ -74,10 +72,9 @@ public final class MainActivity extends BaseActivity {
                 Timber.i("Token received successful");
                 app.saveAuthToken(authToken);
             } else {
-                //show err
+                Timber.e("Token parsing failed");
+                showToast(getString(R.string.error_auth));
             }
-        } else {
-            //show err
         }
     }
 
@@ -85,11 +82,12 @@ public final class MainActivity extends BaseActivity {
         final Fragment fragment = app.isLoggedIn() ? new GalleryFragment() : new AuthFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, fragment)
+                .disallowAddToBackStack()
                 .commit();
     }
 
     @Override
     public void onBackPressed() {
-        moveTaskToBack(true);
+        finishAffinity();
     }
 }
