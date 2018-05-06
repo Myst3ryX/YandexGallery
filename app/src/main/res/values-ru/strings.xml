@@ -10,11 +10,15 @@
     <string name="action_delete">Удалить</string>
     <string name="action_image_info">Информация</string>
 
-    <!--Auth Dialog-->
-    <string name="auth_title">Требуется авторизация</string>
-    <string name="auth_message">Для работы с приложением вам необходимо войти в свою учетную запись Яндекс.
+    <!--Login Dialog-->
+    <string name="login_title">Требуется авторизация</string>
+    <string name="login_message">Для работы с приложением вам необходимо войти в свою учетную запись Яндекс.
         \n\nАвторизация будет выполнена в браузере. Продолжить?</string>
-    <string name="auth_exit_btn">Выход</string>
+    <string name="login_exit_btn">Выход</string>
+
+    <!--Logout Dialog-->
+    <string name="logout_title">Выходим?</string>
+    <string name="logout_message">Вы действительно хотите разлогиниться и выйти из приложения?</string>
 
     <!--About Dialog-->
     <string name="about_title">О Программе</string>

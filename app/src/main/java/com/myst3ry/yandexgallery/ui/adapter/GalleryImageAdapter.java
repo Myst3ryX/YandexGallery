@@ -26,9 +26,9 @@ public final class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImage
     private final OnImageClickListener onImageClickListener;
     private List<Image> images;
 
-    public GalleryImageAdapter(final OnImageClickListener listener) {
+    public GalleryImageAdapter(final OnImageClickListener onImageClickListener) {
+        this.onImageClickListener = onImageClickListener;
         images = new ArrayList<>();
-        onImageClickListener = listener;
     }
 
     @Override

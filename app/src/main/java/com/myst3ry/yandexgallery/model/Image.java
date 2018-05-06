@@ -5,6 +5,10 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+/*
+ * Image model class
+ */
+
 public final class Image implements Parcelable {
 
     @SerializedName("name")

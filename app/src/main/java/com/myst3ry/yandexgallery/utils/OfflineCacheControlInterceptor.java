@@ -11,7 +11,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /*
- * Interceptor for supporting offline okhttp cache
+ * Interceptor for supporting offline Okhttp Cache
  */
 
 public final class OfflineCacheControlInterceptor implements Interceptor {

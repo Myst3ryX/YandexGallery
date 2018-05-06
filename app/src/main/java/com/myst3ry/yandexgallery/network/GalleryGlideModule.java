@@ -21,8 +21,8 @@ import javax.inject.Inject;
 import okhttp3.OkHttpClient;
 
 /*
-* Ensures that Glide's generated API is created
-*/
+ * Ensures that Glide's generated API is created
+ */
 
 @GlideModule
 public final class GalleryGlideModule extends AppGlideModule {
@@ -33,14 +33,14 @@ public final class GalleryGlideModule extends AppGlideModule {
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
         super.applyOptions(context, builder);
-        //increase image quality
+        //increase default image quality to argb_8888
         builder.setDefaultRequestOptions(new RequestOptions().format(DecodeFormat.PREFER_ARGB_8888));
     }
 
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
         YandexGalleryApp.getNetworkComponent(context).inject(this);
-        //replace default networking logic to okhttp
+        //replace default networking logic to okhttp logic
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(okHttpClient));
     }
 }

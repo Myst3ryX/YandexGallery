@@ -12,24 +12,24 @@ import com.myst3ry.yandexgallery.R;
 import com.myst3ry.yandexgallery.ui.fragment.AuthFragment;
 
 /*
- * AuthDialogFragment used to displayed the Authorization dialog
+ * LoginDialogFragment used to displayed the Authorization LogIn dialog
+ * Redirects to browser for login with Yandex passport
  */
 
-public final class AuthDialogFragment extends DialogFragment {
+public final class LoginDialogFragment extends DialogFragment {
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         return new AlertDialog.Builder(getActivity(), R.style.AppDialogTheme)
-                .setTitle(R.string.auth_title)
+                .setTitle(R.string.login_title)
                 .setIcon(R.mipmap.ic_launcher)
-                .setMessage(R.string.auth_message)
+                .setMessage(R.string.login_message)
                 .setPositiveButton(android.R.string.ok, (dialog, which) ->
                         startActivity(new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(getArguments().getString(AuthFragment.ARG_AUTH_URL)))))
-                .setNegativeButton(R.string.auth_exit_btn, (dialog, which) -> getActivity().finishAffinity())
+                .setNegativeButton(R.string.login_exit_btn, (dialog, which) -> getActivity().finishAffinity())
                 .create();
     }
-
 }

@@ -51,9 +51,12 @@ public final class YandexGalleryApp extends Application {
     }
 
     private void prepareDaggerComponents() {
+        final AppModule appModule = new AppModule(this);
+        final NetworkModule networkModule = new NetworkModule();
+
         networkComponent = DaggerNetworkComponent.builder()
-                .appModule(new AppModule(this))
-                .networkModule(new NetworkModule())
+                .appModule(appModule)
+                .networkModule(networkModule)
                 .build();
     }
 

@@ -10,6 +10,10 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
+/*
+ * Interface with Yandex.Disk REST API methods
+ */
+
 public interface YandexDiskApi {
 
     String API_BASE_URL = "https://cloud-api.yandex.net/v1/disk/";

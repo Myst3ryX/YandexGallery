@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 
 import com.myst3ry.yandexgallery.BuildConfig;
 import com.myst3ry.yandexgallery.R;
-import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.AuthDialogFragment;
+import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.LoginDialogFragment;
 
 /*
- * AuthFragment used to displayed the Authorization screen before User login
+ * AuthFragment used to displayed the Authorization screen before user LogIn
  */
 
 public final class AuthFragment extends BaseFragment {
@@ -33,11 +33,11 @@ public final class AuthFragment extends BaseFragment {
         final Bundle args = new Bundle();
         args.putString(ARG_AUTH_URL, getAuthUrl());
 
-        //show Auth dialog
-        final AuthDialogFragment authDialogFragment = new AuthDialogFragment();
-        authDialogFragment.setArguments(args);
-        authDialogFragment.setCancelable(false);
-        authDialogFragment.show(getFragmentManager(), null);
+        //show login dialog
+        final LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+        loginDialogFragment.setArguments(args);
+        loginDialogFragment.setCancelable(false);
+        loginDialogFragment.show(getFragmentManager(), null);
     }
 
     private String getAuthUrl() {

@@ -45,7 +45,7 @@ public final class DeleteImageDialogFragment extends DialogFragment {
         String title = currentImage != null ? currentImage.getImageName() : "";
 
         return new AlertDialog.Builder(getActivity(), R.style.AppDialogTheme)
-                .setTitle(String.format(getString(R.string.delete_image_title), ellipTitle(title)))
+                .setTitle(String.format(getString(R.string.delete_image_title), ellipsizeTitle(title)))
                 .setMessage(R.string.delete_image_message)
                 .setNegativeButton(android.R.string.no, (dialog, which) -> dialog.dismiss())
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> onDeleteClickListener.onDeleteConfirmClicked())
@@ -53,7 +53,7 @@ public final class DeleteImageDialogFragment extends DialogFragment {
     }
 
     //try to reformat dialog title with "middle" ellipsize...
-    private String ellipTitle(final String title) {
+    private String ellipsizeTitle(final String title) {
         return title.length() > 21
                 ? title.substring(0, 10) + "..." + title.substring(title.length() - 8, title.length())
                 : title;

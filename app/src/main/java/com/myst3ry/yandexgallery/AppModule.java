@@ -7,6 +7,10 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
+/*
+ * Dagger2 App Module (used in NetworkComponent)
+ */
+
 @Module
 public final class AppModule {
 

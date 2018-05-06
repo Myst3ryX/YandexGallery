@@ -11,6 +11,7 @@ import com.myst3ry.yandexgallery.YandexGalleryApp;
 import com.myst3ry.yandexgallery.ui.fragment.AuthFragment;
 import com.myst3ry.yandexgallery.ui.fragment.GalleryFragment;
 import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.AboutDialogFragment;
+import com.myst3ry.yandexgallery.ui.fragment.dialogfragment.LogoutDialogFragment;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,9 +52,8 @@ public final class MainActivity extends BaseActivity {
                 new AboutDialogFragment().show(getSupportFragmentManager(), null);
                 return true;
             case R.id.action_logout:
-                //clear auth token and quit app
-                app.clearAuthToken();
-                finishAffinity();
+                //show logout dialog and clear the auth token
+                new LogoutDialogFragment().show(getSupportFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

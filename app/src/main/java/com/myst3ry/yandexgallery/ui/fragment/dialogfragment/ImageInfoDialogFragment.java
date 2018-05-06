@@ -58,6 +58,7 @@ public final class ImageInfoDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_fragment_image_info, null);
         final Image currentImage = getArguments() != null ? getArguments().getParcelable(ARG_CURRENT_IMAGE_INFO) : null;
+
         unbinder = ButterKnife.bind(this, view);
 
         if (currentImage != null) {
@@ -92,7 +93,7 @@ public final class ImageInfoDialogFragment extends DialogFragment {
             final SimpleDateFormat outputDate = new SimpleDateFormat(OUTPUT_DATE_FORMAT_PATTERN, Locale.ENGLISH);
             return outputDate.format(inputDate.parse(dateToFormat));
         } catch (Exception e) {
-            Timber.e("Error while parsing date: %s", e.getMessage());
+            Timber.e("Got Exception while parsing Date: %s", e.getMessage());
             return dateToFormat;
         }
     }

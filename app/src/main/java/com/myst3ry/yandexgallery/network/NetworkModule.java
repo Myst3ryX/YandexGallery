@@ -20,10 +20,14 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/*
+ * Dagger2 Network Module (used in NetworkComponent)
+ */
+
 @Module
 public final class NetworkModule {
 
-    private static final int CACHE_SIZE = 100 * 1024 * 1024; //100MB disk cache size
+    private static final int CACHE_SIZE = 100 * 1024 * 1024; //100mb disk cache size
     private static final int CONNECTION_TIMEOUT_SEC = 15; //15sec connection timeout
 
     @Provides

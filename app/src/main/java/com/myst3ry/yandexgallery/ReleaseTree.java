@@ -6,6 +6,10 @@ import android.util.Log;
 
 import timber.log.Timber;
 
+/*
+ * Timber ReleaseTree for release build only
+ */
+
 final class ReleaseTree extends Timber.Tree {
 
     private static final int MAX_LOG_LENGTH = 4000;

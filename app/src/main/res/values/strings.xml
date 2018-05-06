@@ -10,11 +10,15 @@
     <string name="action_delete">Delete</string>
     <string name="action_image_info">Information</string>
 
-    <!--Auth Dialog-->
-    <string name="auth_title">Authorization required</string>
-    <string name="auth_message">To work with the application you need to log in your Yandex account.
+    <!--Login Dialog-->
+    <string name="login_title">Log In</string>
+    <string name="login_message">To work with the Application you need to log in your Yandex account.
         \n\nContinue in browser?</string>
-    <string name="auth_exit_btn">Exit</string>
+    <string name="login_exit_btn">Exit</string>
+
+    <!--Logout Dialog-->
+    <string name="logout_title">Log out</string>
+    <string name="logout_message">Are you sure you want to log out and quit from the Application?</string>
 
     <!--About Dialog-->
     <string name="about_title">About</string>

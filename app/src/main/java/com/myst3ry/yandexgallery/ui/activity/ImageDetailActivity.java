@@ -28,6 +28,9 @@ import com.myst3ry.yandexgallery.utils.listeners.OnDeleteClickListener;
 import butterknife.BindView;
 import timber.log.Timber;
 
+/*
+ * Activity for show full sized image
+ */
 
 public final class ImageDetailActivity extends BaseActivity implements OnDeleteClickListener {
 
@@ -73,7 +76,7 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
                 onBackPressed();
                 return true;
             case R.id.action_share:
-                //share image if public
+                //share image if it public
                 shareImagePublicLink();
                 return true;
             case R.id.action_delete:
@@ -107,7 +110,7 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
                         final Snackbar snackbar = Snackbar.make(imageLarge, R.string.error_check_internet, Snackbar.LENGTH_INDEFINITE);
                         snackbar.setAction(R.string.error_retry_btn, v -> loadImage());
                         snackbar.show();
-                        Timber.e("Full sized Image loading error %s", e != null ? e.getMessage() : null);
+                        Timber.e("Full sized Image loading error: %s", e != null ? e.getMessage() : null);
                         return false;
                     }
 
@@ -120,7 +123,7 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
                 .into(imageLarge);
     }
 
-    //only shares images that's already has been published (publish image func will be added later)
+    //share images that's already has been published (publish image function will be added later)
     private void shareImagePublicLink() {
         final String publicUrl = image.getImagePublicUrl();
         if (publicUrl != null) {
@@ -133,7 +136,7 @@ public final class ImageDetailActivity extends BaseActivity implements OnDeleteC
         }
     }
 
-    //close activity and delete current image
+    //send result, close this activity and delete current image
     @Override
     public void onDeleteConfirmClicked() {
         final Intent deleteIntent = new Intent();
