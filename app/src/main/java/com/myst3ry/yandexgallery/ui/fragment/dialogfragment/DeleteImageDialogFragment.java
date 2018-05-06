@@ -1,6 +1,5 @@
 package com.myst3ry.yandexgallery.ui.fragment.dialogfragment;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,9 +33,8 @@ public final class DeleteImageDialogFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final Activity activity = getActivity();
-        if (activity instanceof OnDeleteClickListener) {
-            this.onDeleteClickListener = (OnDeleteClickListener) activity;
+        if (getActivity() instanceof OnDeleteClickListener) {
+            this.onDeleteClickListener = (OnDeleteClickListener) getActivity();
         }
     }
 
@@ -59,5 +57,11 @@ public final class DeleteImageDialogFragment extends DialogFragment {
         return title.length() > 21
                 ? title.substring(0, 10) + "..." + title.substring(title.length() - 8, title.length())
                 : title;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        onDeleteClickListener = null;
     }
 }

@@ -58,10 +58,7 @@ public final class YandexGalleryApp extends Application {
     }
 
     private void installLeakCanary() {
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return;
-        }
-        refWatcher = LeakCanary.install(this);
+        refWatcher = BuildConfig.DEBUG ? LeakCanary.install(this) : RefWatcher.DISABLED;
     }
 
     private void initBridge() {
